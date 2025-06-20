@@ -1,0 +1,9 @@
+{
+  "cpu_test_duration": 300,
+  "storage_test_size": "1G",
+  "memory_test_size": "512M",
+  "gpu_test_duration": 180,
+  "temp_threshold_cpu": 85,
+  "temp_threshold_gpu": 80,
+  "quick_mode": false
+}
