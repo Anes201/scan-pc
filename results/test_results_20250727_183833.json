@@ -1,0 +1,52 @@
+{
+  "test_results": {
+    "cpu_stress": {
+      "max_cpu_temp": 0,
+      "max_gpu_temp": 59.0,
+      "passed": true
+    },
+    "gpu_stress": {
+      "max_cpu_temp": 0,
+      "max_gpu_temp": 68.0,
+      "passed": false
+    },
+    "memory_stress": {
+      "passed": true
+    },
+    "storage_health": {
+      "details": [],
+      "passed": true
+    },
+    "storage_perf": {
+      "read_iops": 36788,
+      "write_iops": 36806,
+      "passed": true
+    }
+  },
+  "system_info": {
+    "timestamp": "2025-07-27T18:37:33.706596",
+    "cpu": {
+      "model": "AMD Ryzen 7 4700U with Radeon Graphics",
+      "cores": 8
+    },
+    "memory": {
+      "total_gb": 15.0
+    },
+    "storage": [
+      {
+        "disk": "nvme0n1",
+        "device": "/dev/nvme0n1",
+        "size_gb": 136,
+        "model": "SAMSUNG MZVLQ512HBLU-00B00"
+      },
+      {
+        "disk": "sda",
+        "device": "/dev/sda",
+        "size_gb": 1863,
+        "model": "WDC WD20NMVW-11EDZS6"
+      }
+    ],
+    "gpu": "Advanced Micro Devices, Inc. [AMD/ATI] Renoir [Radeon RX Vega 6 (Ryzen 4000/5000 Mobile Series)] (rev c2)",
+    "monitor": "1920x1080"
+  }
+}

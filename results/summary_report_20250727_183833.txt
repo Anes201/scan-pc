@@ -1,0 +1,18 @@
+===== Hardware Diagnostic Report =====
+Timestamp: 2025-07-27T18:37:33.706596
+
+-- System Information --
+CPU: AMD Ryzen 7 4700U with Radeon Graphics (8 Cores)
+GPU: Advanced Micro Devices, Inc.  Renoir  (rev c2)
+Memory: 15.0 GB
+Storage 0: SAMSUNG MZVLQ512HBLU-00B00 (136 GB)
+Storage 1: WDC WD20NMVW-11EDZS6 (1863 GB)
+
+-- Test Results --
+ Cpu Stress (Max Temp: 0°C)
+ Gpu Stress (Max Temp: 68.0°C)
+ Memory Stress 
+ Storage Health 
+ Storage Perf (Read: 36788 IOPS, Write: 36806 IOPS)
+
+-- Overall Status: ONE OR MORE TESTS FAILED --
