@@ -1,0 +1,46 @@
+{
+  "test_results": {
+    "cpu_stress": {
+      "max_cpu_temp": 0,
+      "max_gpu_temp": 64.0,
+      "passed": true
+    },
+    "gpu_stress": {
+      "max_cpu_temp": 0,
+      "max_gpu_temp": 71.0,
+      "passed": false
+    },
+    "memory_stress": {
+      "passed": true
+    },
+    "storage_health": {
+      "details": [],
+      "passed": false
+    },
+    "storage_perf": {
+      "read_iops": 4637,
+      "write_iops": 4623,
+      "passed": true
+    }
+  },
+  "system_info": {
+    "timestamp": "2025-08-05T20:20:58.956889",
+    "cpu": {
+      "model": "AMD Ryzen 5 PRO 3400G with Radeon Vega Graphics",
+      "cores": 8
+    },
+    "memory": {
+      "total_gb": 15.5
+    },
+    "storage": [
+      {
+        "disk": "sda",
+        "device": "/dev/sda",
+        "size_gb": 67,
+        "model": "SSD"
+      }
+    ],
+    "gpu": "Advanced Micro Devices, Inc. [AMD/ATI] Polaris 20 XL [Radeon RX 580 2048SP] (rev ef)",
+    "monitor": "1920x1080 @ 143.88Hz"
+  }
+}

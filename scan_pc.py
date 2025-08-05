@@ -13,6 +13,7 @@ import argparse
 import subprocess
 import threading
 import re
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -34,29 +35,52 @@ console = Console()
 
 class SystemChecker:
     """Handle system dependency checks and installations."""
-    
-    REQUIRED_PACKAGES = [
-        'stress-ng', 'smartmontools', 'lm-sensors', 'hdparm',
-        'fio', 'glmark2', 'speedtest-cli', 'x11-utils'  # x11-utils for xrandr
-    ]
-    
+
+    REQUIRED_COMMANDS = {
+        'stress-ng': 'stress-ng',
+        'smartctl': 'smartmontools',
+        'sensors': 'lm-sensors',
+        'hdparm': 'hdparm',
+        'fio': 'fio',
+        'glmark2': 'glmark2',
+        'speedtest-cli': 'speedtest-cli',
+        'xrandr': 'x11-utils',
+    }
+
     def __init__(self):
         self.missing_packages = []
+        self.package_manager = self._get_package_manager()
 
-    def _is_package_installed(self, package):
-        try:
-            result = subprocess.run(['dpkg', '-s', package], capture_output=True, text=True, check=False)
-            return 'Status: install ok installed' in result.stdout
-        except FileNotFoundError:
-            return False
+    def _get_package_manager(self):
+        if shutil.which('apt-get'):
+            return 'apt'
+        if shutil.which('dnf'):
+            return 'dnf'
+        if shutil.which('yum'):
+            return 'yum'
+        if shutil.which('pacman'):
+            return 'pacman'
+        return None
+
+    def _is_command_available(self, command):
+        # Check standard PATH locations first
+        if shutil.which(command):
+            return True
+        # If not found, check common administrative binary directories
+        for path in ['/sbin', '/usr/sbin', '/usr/local/sbin']:
+            if (Path(path) / command).is_file():
+                return True
+        return False
 
     def check_dependencies(self):
         console.print("[cyan][INFO][/cyan] Checking system dependencies...")
-        for package in self.REQUIRED_PACKAGES:
-            if not self._is_package_installed(package):
+        self.missing_packages = []
+        for command, package in self.REQUIRED_COMMANDS.items():
+            if not self._is_command_available(command):
                 self.missing_packages.append(package)
         
         if self.missing_packages:
+            self.missing_packages = sorted(list(set(self.missing_packages)))
             console.print(f"[yellow][WARN][/yellow] Missing packages: {', '.join(self.missing_packages)}")
             return False
         console.print("[green][OK][/green] All dependencies satisfied.")
@@ -65,17 +89,56 @@ class SystemChecker:
     def install_missing_packages(self):
         if not self.missing_packages:
             return True
-        console.print("[cyan][INSTALL][/cyan] Installing missing packages...")
+
+        if not self.package_manager:
+            console.print("[red][ERROR][/red] Could not find a supported package manager (apt, dnf, yum, pacman).")
+            console.print("Please install the following packages manually:")
+            console.print(f"  {' '.join(self.missing_packages)}")
+            return False
+
+        console.print(f"[cyan][INSTALL][/cyan] This script needs to install packages using sudo.")
+        
+        install_commands = {
+            'apt': ['sudo', 'apt-get', 'install', '-y'],
+            'dnf': ['sudo', 'dnf', 'install', '-y'],
+            'yum': ['sudo', 'yum', 'install', '-y'],
+            'pacman': ['sudo', 'pacman', '-S', '--noconfirm'],
+        }
+        
+        update_commands = {
+            'apt': ['sudo', 'apt-get', 'update'],
+            'dnf': None, 'yum': None, 'pacman': None,
+        }
+
         try:
-            subprocess.run(['apt', 'update'], check=True)
-            for package in self.missing_packages:
-                console.print(f"[blue][INFO][/blue] Installing {package}...")
-                subprocess.run(['apt', 'install', '-y', package], check=True, capture_output=True, text=True)
-                console.print(f"[green][OK][/green] {package} installed successfully.")
+            if update_commands[self.package_manager]:
+                console.print(f"[blue][INFO][/blue] Updating package lists with {self.package_manager}...")
+                subprocess.run(update_commands[self.package_manager], check=True, capture_output=True, text=True)
+
+            install_cmd = install_commands[self.package_manager]
+            console.print(f"[blue][INFO][/blue] Installing {' '.join(self.missing_packages)}...")
+            subprocess.run(install_cmd + self.missing_packages, check=True, capture_output=True, text=True)
+            
+            # Verify
+            previously_missing = self.missing_packages[:]
             self.missing_packages = []
-            return True
+            for command, package in self.REQUIRED_COMMANDS.items():
+                if package in previously_missing and not self._is_command_available(command):
+                    self.missing_packages.append(package)
+
+            if not self.missing_packages:
+                console.print("[green][OK][/green] Dependencies installed successfully.")
+                return True
+            else:
+                console.print(f"[red][ERROR][/red] Failed to install: {', '.join(self.missing_packages)}. Please install manually.")
+                return False
+
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
-            console.print(f"[red][ERROR][/red] Failed to install packages: {e}")
+            console.print(f"[red][ERROR][/red] A command failed during installation.")
+            if isinstance(e, subprocess.CalledProcessError):
+                console.print(f"  [bold]Command:[/bold] {' '.join(e.cmd)}")
+                console.print(f"  [bold]Stderr:[/bold]\n{e.stderr}")
+            console.print("Please try installing packages manually and re-run the script.")
             return False
 
 class SystemInfo:
@@ -288,6 +351,19 @@ class TestRunner:
 
     def _test_gpu(self, duration):
         self.results['test_results']['gpu_stress'] = {}
+        
+        if not shutil.which('glmark2'):
+            console.print("[yellow][SKIP][/yellow] glmark2 command not found. Skipping GPU test.")
+            self.results['test_results']['gpu_stress']['passed'] = True
+            self.results['test_results']['gpu_stress']['status'] = "Skipped (glmark2 not found)"
+            return True
+
+        if not os.environ.get('DISPLAY'):
+            console.print("[yellow][SKIP][/yellow] No display found (DISPLAY env var not set). Skipping GPU test.")
+            self.results['test_results']['gpu_stress']['passed'] = True
+            self.results['test_results']['gpu_stress']['status'] = "Skipped (No display)"
+            return True
+
         cmd = ['glmark2', '--run-forever']
         return self._run_test_with_monitoring(cmd, duration, 'gpu_stress')
 
@@ -370,7 +446,10 @@ class TestRunner:
         for key, data in res.items():
             status = "[green][PASS][/green]" if data.get('passed') else "[red][FAIL][/red]"
             details = ""
-            if 'cpu_stress' in key: details = f"(Max Temp: {data.get('max_cpu_temp', 'N/A')}°C)"
+            if data.get('status', '').startswith('Skipped'):
+                status = f"[yellow][SKIP][/yellow]"
+                details = f"({data.get('status')})"
+            elif 'cpu_stress' in key: details = f"(Max Temp: {data.get('max_cpu_temp', 'N/A')}°C)"
             elif 'gpu_stress' in key: details = f"(Max Temp: {data.get('max_gpu_temp', 'N/A')}°C)"
             elif 'storage_perf' in key: details = f"(Read: {data.get('read_iops', 'N/A')} IOPS, Write: {data.get('write_iops', 'N/A')} IOPS)"
             s += f"{status} {key.replace('_', ' ').title()} {details}\n"

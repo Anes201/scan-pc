@@ -1,0 +1,17 @@
+===== Hardware Diagnostic Report =====
+Timestamp: 2025-08-05T20:19:25.820478
+
+-- System Information --
+CPU: AMD Ryzen 5 PRO 3400G with Radeon Vega Graphics (8 Cores)
+GPU: Advanced Micro Devices, Inc.  Polaris 20 XL  (rev ef)
+Memory: 15.5 GB
+Storage 0: SSD (67 GB)
+
+-- Test Results --
+ Cpu Stress (Max Temp: 0°C)
+ Gpu Stress (Max Temp: 70.0°C)
+ Memory Stress 
+ Storage Health 
+ Storage Perf (Read: 4503 IOPS, Write: 4479 IOPS)
+
+-- Overall Status: ONE OR MORE TESTS FAILED --
