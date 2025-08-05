@@ -1,0 +1,52 @@
+{
+  "test_results": {
+    "cpu_stress": {
+      "max_cpu_temp": 60.0,
+      "max_gpu_temp": 54.0,
+      "passed": true
+    },
+    "gpu_stress": {
+      "max_cpu_temp": 48.0,
+      "max_gpu_temp": 62.0,
+      "passed": false
+    },
+    "memory_stress": {
+      "passed": true
+    },
+    "storage_health": {
+      "details": [],
+      "passed": true
+    },
+    "storage_perf": {
+      "read_iops": 2820,
+      "write_iops": 2822,
+      "passed": true
+    }
+  },
+  "system_info": {
+    "timestamp": "2025-07-27T20:55:31.930754",
+    "cpu": {
+      "model": "Intel(R) Core(TM) i3-10100F CPU @ 3.60GHz",
+      "cores": 8
+    },
+    "memory": {
+      "total_gb": 15.5
+    },
+    "storage": [
+      {
+        "disk": "sda",
+        "device": "/dev/sda",
+        "size_gb": 67,
+        "model": "SSD"
+      },
+      {
+        "disk": "sdc",
+        "device": "/dev/sdc",
+        "size_gb": 1863,
+        "model": "WDC WD20NMVW-11EDZS6"
+      }
+    ],
+    "gpu": "Advanced Micro Devices, Inc. [AMD/ATI] Polaris 20 XL [Radeon RX 580 2048SP] (rev ef)",
+    "monitor": "1920x1080 @ 144.00Hz"
+  }
+}

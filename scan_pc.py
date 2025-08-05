@@ -430,7 +430,24 @@ class TestRunner:
 
         self._save_results()
 
-def main():    parser = argparse.ArgumentParser(description='Hardware Test Suite')    parser.add_argument('--quick', action='store_true', help='Run shorter tests (30s).')    parser.add_argument('--config', default='config.json', help='Path to config file.')    parser.add_argument('--skip-gpu', action='store_true', help='Skip GPU tests.')    parser.add_argument('--skip-storage', action='store_true', help='Skip all storage tests.')    parser.add_argument('--skip-cpu', action='store_true', help='Skip CPU and Memory tests.')    args = parser.parse_args()        try:        runner = TestRunner(config_path=args.config, args=args)        runner.run_full_test()    except KeyboardInterrupt:        console.print(f"\n[yellow][WARN][/yellow] Test interrupted by user.")    except Exception as e:        console.print(f"\n[red][ERROR][/red] An unexpected critical error occurred: {e}")        import traceback        traceback.print_exc()
+def main():
+    parser = argparse.ArgumentParser(description='Hardware Test Suite')
+    parser.add_argument('--quick', action='store_true', help='Run shorter tests (30s).')
+    parser.add_argument('--config', default='config.json', help='Path to config file.')
+    parser.add_argument('--skip-gpu', action='store_true', help='Skip GPU tests.')
+    parser.add_argument('--skip-storage', action='store_true', help='Skip all storage tests.')
+    parser.add_argument('--skip-cpu', action='store_true', help='Skip CPU and Memory tests.')
+    parser.add_argument('--non-interactive', action='store_true', help='Run without prompts.')
+    args = parser.parse_args()
+    try:
+        runner = TestRunner(config_path=args.config, args=args)
+        runner.run_full_test()
+    except KeyboardInterrupt:
+        console.print(f"\n[yellow][WARN][/yellow] Test interrupted by user.")
+    except Exception as e:
+        console.print(f"\n[red][ERROR][/red] An unexpected critical error occurred: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()
